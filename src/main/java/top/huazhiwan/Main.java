@@ -10,12 +10,14 @@ import javax.swing.*;
 public class Main extends JFrame {
 
     public static final String version = "0.1.1";
+    public static boolean edit_flag = true;
     public static Project project = Project.getDefault();
 
 
     public static void main(String[] args) {
         FlatArcDarkIJTheme.setup();
         SwingUtilities.invokeLater(() -> {
+            MainFrame.instance.init();
             MainFrame.instance.setVisible(true);
         });
     }

@@ -24,14 +24,35 @@ public class MetadataPanel extends JPanel {
                 return col > 0 && row < 2;
             }
         };
+        tableModel.addTableModelListener(e -> {
+            int row = e.getFirstRow();
+            int column = e.getColumn();
+            if (column < 0) {
+                return;
+            }
+            String value = (String) tableModel.getValueAt(row, column);
+            switch (row) {
+                case 0:
+                    Main.project.getMetaData().setName(value);
+                    MainFrame.instance.edit(true);
+                    break;
+                case 1:
+                    Main.project.getMetaData().setDefaultLocale(value);
+                    MainFrame.instance.edit(true);
+                    break;
+            }
+        });
 
         init();
         JTable table = new JTable(tableModel);
         add(table);
     }
 
-    private void init() {
+    protected void init() {
         var metadata = Main.project.getMetaData();
+        while (tableModel.getRowCount() > 0) {
+            tableModel.removeRow(0);
+        }
         tableModel.addRow(new Object[]{"项目名称", metadata.getName()});
         tableModel.addRow(new Object[]{"词元语种", metadata.getDefaultLocale()});
         tableModel.addRow(new Object[]{"更新时间", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(metadata.getUpdatedTime()))});

@@ -28,15 +28,19 @@ public class LocalePanel extends JPanel {
         JButton removeButton = new JButton("删除");
 
         addButton.addActionListener(e -> {
-            String newCategory = JOptionPane.showInputDialog("添加新语种：");
-            if (newCategory != null && !newCategory.trim().isEmpty()) {
-                localeModel.addElement(newCategory.trim());
+            String newLocale = JOptionPane.showInputDialog("添加新语种：");
+            if (newLocale != null && !newLocale.trim().isEmpty()) {
+                Main.project.getLocales().add(newLocale.trim());
+                MainFrame.instance.edit(true);
+                localeModel.addElement(newLocale.trim());
             }
         });
 
         removeButton.addActionListener(e -> {
             int selected = locales.getSelectedIndex();
             if (selected != -1) {
+                Main.project.getLocales().remove(selected);
+                MainFrame.instance.edit(true);
                 localeModel.remove(selected);
             }
         });
@@ -47,7 +51,7 @@ public class LocalePanel extends JPanel {
     }
 
 
-    private void init() {
+    protected void init() {
         localeModel.clear();
         List<String> types = Main.project.getLocales();
         for (String type : types) {

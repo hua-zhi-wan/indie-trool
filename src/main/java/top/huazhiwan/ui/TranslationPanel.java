@@ -86,22 +86,59 @@ public class TranslationPanel extends JPanel {
         tableModel = new DefaultTableModel(columms, 0) {
             @Override
             public boolean isCellEditable(int row, int col) {
-                return Set.of(2, 3, 4).contains(col);
+                return Set.of(1, 2, 3, 4).contains(col);
             }
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
                 return switch (columnIndex) {
+                    case 0 -> Integer.class;
                     case 4 -> Boolean.class;
                     default -> String.class;
                 };
             }
         };
+
+        // 模型更改同步到实体
+        tableModel.addTableModelListener(e -> {
+            int row = e.getFirstRow();
+            int column = e.getColumn();
+            if (column < 0) {
+                return;
+            }
+            int id = (int) tableModel.getValueAt(row, 0) - 1;
+            Object value = tableModel.getValueAt(row, column);
+            switch (column) {
+                case 2:
+                    String locale = (String) localeFilterCombo.getSelectedItem();
+                    Main.project.getWords().get(id).setTranslation(locale, (String) value);
+                    MainFrame.instance.edit(true);
+                    break;
+                case 3:
+                    Main.project.getWords().get(id).setType((String) value);
+                    MainFrame.instance.edit(true);
+                    break;
+                case 4:
+                    Main.project.getWords().get(id).setDeprecated((boolean) value);
+                    MainFrame.instance.edit(true);
+                    break;
+            }
+        });
         reloadData();
 
         JTable table = new JTable(tableModel);
+        table.setShowGrid(true);
         sorter = new TableRowSorter<>(table.getModel());
         table.setRowSorter(sorter);
+
+        // 为翻译列设置多行编辑器与渲染器
+        TableColumn column = table.getColumnModel().getColumn(2);
+        column.setCellEditor(new MultiLineCellEditor(true));
+        column.setCellRenderer(new MultiLineCellRenderer());
+        column = table.getColumnModel().getColumn(1);
+        column.setCellEditor(new MultiLineCellEditor(false));
+        column.setCellRenderer(new MultiLineCellRenderer());
+
 
         // 使用共享的 comboBoxModel
         JComboBox<String> typeComboBox = new JComboBox<>(typeComboBoxModel);
@@ -112,14 +149,17 @@ public class TranslationPanel extends JPanel {
         // 监听分组变化
         var typeModel = TypePanel.instance.getTypeModel();
         typeModel.addListDataListener(new ListDataListener() {
+            @Override
             public void contentsChanged(ListDataEvent e) {
                 updateComponents();
             }
 
+            @Override
             public void intervalAdded(ListDataEvent e) {
                 updateComponents();
             }
 
+            @Override
             public void intervalRemoved(ListDataEvent e) {
                 updateComponents();
             }
@@ -130,6 +170,29 @@ public class TranslationPanel extends JPanel {
                 updateTypeComboBoxModel();
                 // 触发表格刷新
                 table.repaint();
+            }
+        });
+
+        // 监听语种变化
+        var localeModel = LocalePanel.instance.getLocaleModel();
+        localeModel.addListDataListener(new ListDataListener() {
+            @Override
+            public void intervalAdded(ListDataEvent e) {
+                updateComponent();
+            }
+
+            @Override
+            public void intervalRemoved(ListDataEvent e) {
+                updateComponent();
+            }
+
+            @Override
+            public void contentsChanged(ListDataEvent e) {
+                updateComponent();
+            }
+
+            private void updateComponent() {
+                updateLocaleFilter();
             }
         });
 
@@ -159,7 +222,7 @@ public class TranslationPanel extends JPanel {
         if (hideDeprecatedCheck.isSelected()) {
             filters.add(new RowFilter<>() {
                 public boolean include(Entry<?, ?> entry) {
-                    Object value = entry.getValue(5);
+                    Object value = entry.getValue(4);
                     return value != null && !Boolean.TRUE.equals(value);
                 }
             });
@@ -184,15 +247,22 @@ public class TranslationPanel extends JPanel {
         Word word = Main.project.getWords().get(index);
         String locale = (String) localeFilterCombo.getSelectedItem();
         return new Object[]{
-                Integer.toString(index + 1), word.getRaw(),
+                index + 1, word.getRaw(),
                 word.getTranslation(locale),
                 word.getType(), word.isDeprecated(),
         };
     }
 
     private void reloadData() {
+        while (tableModel.getRowCount() > 0) {
+            tableModel.removeRow(tableModel.getRowCount() - 1);
+        }
         for (int i = 0; i < Main.project.getWords().size(); ++i) {
             tableModel.addRow(convertWord(i));
         }
+    }
+
+    protected void init() {
+        reloadData();
     }
 }

@@ -31,6 +31,8 @@ public class TypePanel extends JPanel {
         addButton.addActionListener(e -> {
             String newType = JOptionPane.showInputDialog("输入新分组名称：");
             if (newType != null && !newType.trim().isEmpty()) {
+                Main.project.getTypes().add(newType.trim());
+                MainFrame.instance.edit(true);
                 typeModel.addElement(newType.trim());
             }
         });
@@ -40,13 +42,19 @@ public class TypePanel extends JPanel {
                 return;
             String newType = JOptionPane.showInputDialog("更改分组名称：", typeList.getSelectedValue());
             if (newType != null && !newType.trim().isEmpty()) {
-                typeModel.set(typeList.getSelectedIndex(), newType.trim());
+                int index  =typeList.getSelectedIndex();
+                String val = newType.trim();
+                Main.project.getTypes().set(index, val);
+                MainFrame.instance.edit(true);
+                typeModel.set(index, val);
             }
         });
 
         removeButton.addActionListener(e -> {
             int selected = typeList.getSelectedIndex();
             if (selected != -1) {
+                Main.project.getTypes().remove(selected);
+                MainFrame.instance.edit(true);
                 typeModel.remove(selected);
             }
         });
@@ -57,7 +65,7 @@ public class TypePanel extends JPanel {
         this.add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    private void init() {
+    protected void init() {
         typeModel.clear();
         List<String> types = Main.project.getTypes();
         for (String type : types) {

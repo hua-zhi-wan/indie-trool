@@ -1,17 +1,21 @@
 package top.huazhiwan.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Project {
-    private Metadata metaData = new Metadata();
-    private List<String> locales = new ArrayList<>();
-    private List<String> types = new ArrayList<>();
-    private List<Word> words = new ArrayList<>();
+    private Metadata metaData;
+    private List<String> locales;
+    private List<String> types;
+    private List<Word> words;
 
     public static Project getDefault() {
         Project project = new Project();
