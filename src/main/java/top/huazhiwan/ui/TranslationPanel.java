@@ -270,6 +270,12 @@ public class TranslationPanel extends JPanel {
         }
     }
 
+    protected void clear() {
+        while (tableModel.getRowCount() > 0) {
+            tableModel.removeRow(0);
+        }
+    }
+
     protected void init() {
         reloadData();
     }

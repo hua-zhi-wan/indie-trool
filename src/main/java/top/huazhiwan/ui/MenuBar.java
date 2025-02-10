@@ -15,7 +15,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,6 +30,7 @@ public class MenuBar extends JMenuBar {
         JMenuItem newProjectItem = new JMenuItem("新项目");
         fileMenu.add(newProjectItem);
         newProjectItem.addActionListener(e -> {
+            TranslationPanel.instance.clear();
             Main.project = Project.getDefault();
             MainFrame.instance.init();
         });
@@ -46,6 +46,7 @@ public class MenuBar extends JMenuBar {
             if (result == JFileChooser.APPROVE_OPTION) {
                 file = fileChooser.getSelectedFile();
                 try (FileReader reader = new FileReader(file)) {
+                    TranslationPanel.instance.clear();
                     YamlUtil.load(reader);
                     MainFrame.instance.init();
                     MainFrame.instance.edit(false);
@@ -178,5 +179,14 @@ public class MenuBar extends JMenuBar {
         });
         exportMenu.add(exportCSVItem);
         add(exportMenu);
+
+        JMenu aboutMenu = new JMenu("关于");
+        JMenuItem aboutProjectItem = new JMenuItem("关于项目");
+        aboutProjectItem.addActionListener(e -> {
+            JOptionPane.showMessageDialog(null, "github项目地址:\n" +
+                    "https://github.com/hua-zhi-wan/indie-trool");
+        });
+        aboutMenu.add(aboutProjectItem);
+        add(aboutMenu);
     }
 }
