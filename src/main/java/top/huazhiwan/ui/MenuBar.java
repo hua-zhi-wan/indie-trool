@@ -103,6 +103,18 @@ public class MenuBar extends JMenuBar {
         add(fileMenu);
 
         JMenu wordMenu = new JMenu("词元");
+        JMenuItem addSingleWord = new JMenuItem("添加词元");
+        addSingleWord.addActionListener(e -> {
+            String str = JOptionPane.showInputDialog("添加词元");
+            if (str != null && !str.trim().isEmpty()) {
+                String locale = Main.project.getMetaData().getDefaultLocale();
+                Word newWord = Word.builder().raw(str).locale(locale).time(System.currentTimeMillis()).build();
+                Main.project.getWords().add(newWord);
+                TranslationPanel.instance.init();
+            }
+        });
+        wordMenu.add(addSingleWord);
+
         JMenuItem importWordsFromJson = new JMenuItem("从JSON导入词元");
         importWordsFromJson.addActionListener(e -> {
             File tmpFile;
@@ -119,7 +131,7 @@ public class MenuBar extends JMenuBar {
                     List<Word> words = strings.stream()
                             .filter(s -> !set.contains(s))
                             .map(s -> Word.builder()
-                                    .raw(s).locale(locale).translations(new HashMap<>())
+                                    .raw(s).locale(locale)
                                     .time(System.currentTimeMillis()).build())
                             .toList();
                     Main.project.getWords().addAll(words);

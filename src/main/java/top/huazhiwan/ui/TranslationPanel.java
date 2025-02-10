@@ -64,6 +64,7 @@ public class TranslationPanel extends JPanel {
     private void updateTypeFilter() {
         typeFilterCombo.removeAllItems();
         typeFilterCombo.addItem("全部");
+        typeFilterCombo.addItem("未分类");
         var typeModel = TypePanel.instance.getTypeModel();
         for (int i = 0; i < typeModel.size(); i++) {
             typeFilterCombo.addItem(typeModel.get(i));
@@ -132,7 +133,8 @@ public class TranslationPanel extends JPanel {
         table.setRowSorter(sorter);
 
         // 为翻译列设置多行编辑器与渲染器
-        TableColumn column = table.getColumnModel().getColumn(2);
+        TableColumn column;
+        column = table.getColumnModel().getColumn(2);
         column.setCellEditor(new MultiLineCellEditor(true));
         column.setCellRenderer(new MultiLineCellRenderer());
         column = table.getColumnModel().getColumn(1);
@@ -214,8 +216,14 @@ public class TranslationPanel extends JPanel {
 
         // 类型筛选
         String selectedType = (String) typeFilterCombo.getSelectedItem();
-        if (selectedType != null && !selectedType.equals("全部")) {
-            filters.add(RowFilter.regexFilter("^" + selectedType + "$", 3));
+        if (selectedType != null) {
+            if (!selectedType.equals("全部")) {
+                if (selectedType.equals("未分类")) {
+                    filters.add(RowFilter.regexFilter("^$"));
+                } else {
+                    filters.add(RowFilter.regexFilter("^" + selectedType + "$", 3));
+                }
+            }
         }
 
         // 弃用筛选
@@ -255,7 +263,7 @@ public class TranslationPanel extends JPanel {
 
     private void reloadData() {
         while (tableModel.getRowCount() > 0) {
-            tableModel.removeRow(tableModel.getRowCount() - 1);
+            tableModel.removeRow(0);
         }
         for (int i = 0; i < Main.project.getWords().size(); ++i) {
             tableModel.addRow(convertWord(i));
