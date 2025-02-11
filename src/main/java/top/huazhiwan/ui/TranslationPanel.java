@@ -66,7 +66,7 @@ public class TranslationPanel extends JPanel {
         typeFilterCombo.addItem("全部");
         typeFilterCombo.addItem("未分类");
         var typeModel = TypePanel.instance.getTypeModel();
-        for (int i = 0; i < typeModel.size(); i++) {
+        for (int i = 1; i < typeModel.size(); i++) {
             typeFilterCombo.addItem(typeModel.get(i));
         }
     }

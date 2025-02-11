@@ -68,6 +68,7 @@ public class TypePanel extends JPanel {
     protected void init() {
         typeModel.clear();
         List<String> types = Main.project.getTypes();
+        typeModel.addElement("");
         for (String type : types) {
             typeModel.addElement(type);
         }

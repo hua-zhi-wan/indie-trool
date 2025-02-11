@@ -16,9 +16,7 @@ public class Main extends JFrame {
 
     public static void main(String[] args) {
         FlatArcDarkIJTheme.setup();
-        SwingUtilities.invokeLater(() -> {
-            MainFrame.instance.init();
-            MainFrame.instance.setVisible(true);
-        });
+        MainFrame.instance.init();
+        MainFrame.instance.setVisible(true);
     }
 }

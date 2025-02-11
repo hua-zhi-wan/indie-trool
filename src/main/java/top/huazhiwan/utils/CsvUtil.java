@@ -23,11 +23,14 @@ public class CsvUtil {
                 for (String locale : locales) {
                     list.add(word.getTranslation(locale));
                 }
-                writer1.write(String.join(",", list.stream().map(s -> '"' + s + '"').toList()));
+                writer1.write(String.join(",", list.stream().map(CsvUtil::packWord).toList()));
                 writer1.newLine();
             }
         } catch (IOException exception) {
-            return;
         }
+    }
+
+    private static String packWord(String word) {
+        return '"' + String.join("\"\"", word.split("\"")) + '"';
     }
 }
